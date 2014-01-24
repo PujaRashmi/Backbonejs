@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Student Application with Backbone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/bootstrap.css">
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+  </head>
+
+  <body>
+    <div class="navbar navbar-inverse navbar-static-top">
+      <div class="container"><a href="#" class="navbar-brand"> Want To Connect To DB</a>
+        <button data-toggle="collapse" data-target=".navHeaderCollapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+        <div class="collapse navbar-collapse navHeaderCollapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="#/new">Insert Into DB</a></li>
+            <li><a href="#/index">View and Update</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container"><center>
+      <div class="page"></div>
+    </center></div>
+
+    <script type="text/template" id="home-template">
+    <div class="container">
+      <div class="jumbotron">
+        <center><h4>Hello,Here we are doing the CRUD Application</h4></center>
+      </div>
+    </div>
+    </script>
+
+    <script type="text/template" id="user-list-template">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Course</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% _.each(users,function(user){ %>
+            <tr>
+              <td><%= user.get('name').first%></td>
+              <td><%= user.get('course') %></td>
+              <td>
+                <div>
+                  <a href="#/delete/<%= user.get('_id') %>" class="btn btn-danger btn-sm delete">Delete</a>
+                  <a href="#/show/<%= user.get('_id') %>" class="btn btn-primary btn-sm">Show</a>
+                </div>
+              </td>
+            </tr> 
+          <% }) %>
+        </tbody>
+      </table>
+    </script>
+
+    <script type="text/template" id="show-user-template">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Student Full Name</th>
+            <th>Age</th>
+            <th>Contact No</th>
+            <th>Email</th>
+            <th>Course</th>
+            <th>Fee</th>
+            <th>Date of admission</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><%= user.get('name').first%></td>
+            <td><%= user.get('age') %></td>
+            <td><%= user.get('contact') %></td>
+            <td><%= user.get('email') %></td>
+            <td><%= user.get('course') %></td>
+            <td><%= user.get('fee') %></td>
+            <td><%= user.get('doa') %></td>
+            <td><a href="#/edit/<%= user.get('_id') %>" class="btn btn-primary btn-sm">Edit</a></td>
+          </tr> 
+        </tbody>
+      </table>
+    </script>
+
+    <script type="text/template" id="create-user-template">
+      <div class="container">
+        <center>
+          <h3><%= user ? 'Edit ' : 'Enter ' %>Details of Student</h3>
+        </center>
+        <form class="well form-horizontal create-user-form">
+
+          <div class="form-group">
+            <label for="sfname" class="col-sm-3 control-label">Student First Name :</label>
+            <div class="col-sm-7">
+              <input id="sfname" type="text" name="sfname" class="form-control" value="<%= user ? user.get('name').first: '' %>"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="slname" class="col-sm-3 control-label">Student Last Name :</label>
+            <div class="col-sm-7">
+              <input id="slname" type="text" name="slname" class="form-control" value="<%= user ? user.get('name').last : '' %>"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="age" class="col-sm-3 control-label">Student Age :</label>
+            <div class="col-sm-7">
+              <input id="age" type="text" name="age" class="form-control" value="<%= user ? user.get('age') : '' %>"/>
+            </div>
+           </div>
+
+          <div class="form-group">
+            <label for="phone" class="col-sm-3 control-label">Contact NO. : </label>
+            <div class="col-sm-7">
+              <input id="phone" type="tel" name="phone" class="form-control" value="<%= user ? user.get('contact') : '' %>"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="col-sm-3 control-label">Email : </label>
+            <div class="col-sm-7">
+              <input id="email" type="text" name="email" class="form-control" value="<%= user ? user.get('email') : '' %>"/>
+            </div>
+          </div>
+    
+          <div class="form-group">
+            <label for="course" class="col-sm-3 control-label">Course :</label>
+            <div class="col-sm-7">
+              <select id="course" name="course" class="form-control" value="<%= user.get('course') %>" >
+                <option>[select any one]</option>
+                <option>MCA</option>
+                <option>MBA</option>
+                <option>MCM</option>
+                <option>BCA</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="fee" class="col-sm-3 control-label">Fee : </label>
+            <div class="input-group col-sm-7"><span class="input-group-addon">$</span>
+              <input id="fee" type="text" name="fee" class="form-control" value="<%= user ? user.get('fee') : '' %>"/><span class="input-group-addon" >.00</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="doa" class="col-sm-3 control-label">Date Of Admission : </label>
+            <div class="col-sm-7">
+              <input id="doa" type="date" name="doa" class="form-control"/>
+            </div>
+          </div>
+    
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary col-sm-2">Submit</button>
+          </div>
+          <% if(user) { %>
+            <input type="hidden" name="id" value="<%= user.id %>" />
+          <% }; %>
+        </form>
+      </div>
+    </script>
+
+
+
+    <div class="navbar navbar-default navbar-fixed-bottom">
+      <div class="container">
+        <p class="navbar-text pull-left">Site Build By Puja</p><a href="#" class="btn navbar-button btn-danger pull-right">Subscribe on Youtube</a>
+      </div>
+    </div>
+
+    <script src = "http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src= "./javascripts/underscore.js"></script>
+    <script src= "./javascripts/backbone.js"></script>
+    <script src= "./javascripts/bootstrap.js"></script>
+    <script src= "./javascripts/bootstrap.min.js"></script>
+
+    <script>
+
+      $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+        options.url = 'http://localhost:3000' + options.url;
+      });
+
+      $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name] !== undefined) {
+              if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+              }
+              o[this.name].push(this.value || '');
+            } else {
+              o[this.name] = this.value || '';
+            }
+        });
+        return o;
+      };
+
+      var Users = Backbone.Collection.extend({
+        url: '/users'
+      });
+
+      var User = Backbone.Model.extend({
+         urlRoot: '/users'
+      });
+
+      var Home = Backbone.View.extend({
+        el: '.page',
+        render: function () {
+          var that = this;
+          var users = new Users();
+          users.fetch({
+            success: function(users){
+              var template = _.template($('#home-template').html(),{});
+              that.$el.html(template);
+            }
+          })
+        }
+      });
+
+      var UserList = Backbone.View.extend({
+        el: '.page',
+        render: function () {
+          var that = this;
+          var users = new Users();
+          users.fetch({
+            success: function(users){
+              var template = _.template($('#user-list-template').html(),{users: users.models});
+              that.$el.html(template);
+            }
+          })
+        }
+      });
+
+      var ShowUser = Backbone.View.extend({
+        el: '.page',
+        render: function (options) {
+          var that = this;
+          var user = new User({id: options.id});
+          user.fetch({
+            success: function(user){
+              var template = _.template($('#show-user-template').html(),{user: user});
+              that.$el.html(template);
+            }
+          })
+        }
+      });
+
+      var DeleteUser = Backbone.View.extend({
+        el: '.page',
+        render: function (options) {
+          var that = this;
+          var user = new User({id: options.id});
+          user.destroy({
+            success: function (user) {
+              router.navigate('index', {trigger:true});
+            }
+          });
+          return false;
+        }
+      });
+
+
+      var CreateUser = Backbone.View.extend({
+        el: '.page',
+        events: {
+          'submit .create-user-form': 'saveUser'
+        },
+
+        saveUser: function (ev) {
+          var userDetails = $(ev.currentTarget).serializeObject();
+          var user = new User();
+          user.save(userDetails, {
+            success: function (user) {
+              router.navigate('index', {trigger:true});
+            }
+          });
+          return false;
+        },
+
+        render: function (options) {
+        var that = this;
+        if(options.id) {
+          that.user = new User({id: options.id});
+          that.user.fetch({
+            success: function (user) {    
+              var template = _.template($('#create-user-template').html(), {user: user});
+              that.$el.html(template);
+            }
+          })
+        } else {
+          var template = _.template($('#create-user-template').html(), {user: null});
+          that.$el.html(template);
+        }
+      }
+    });
+      
+      var Router = Backbone.Router.extend({
+        routes: {
+          '': 'home',
+          'index': 'userList',
+          'show/:id': 'showUser',
+          'new': 'createUser',
+          'delete/:id': 'deleteUser',
+          "edit/:id": "createUser",
+        }
+      });
+
+      var home = new Home();
+      var userList = new UserList();
+      var showUser = new ShowUser();
+      var createUser = new CreateUser();
+      var deleteUser = new DeleteUser();
+
+
+      var router = new Router();
+      router.on('route:home',function () {
+        home.render();
+      });
+      router.on('route:userList',function () {
+        userList.render();
+      });
+      router.on('route:showUser',function (id) {
+        showUser.render({id: id});
+      });
+      router.on('route:createUser',function (id) {
+        createUser.render({id: id});
+      });
+      router.on('route:deleteUser',function (id) {
+        deleteUser.render({id: id});
+      });
+      
+      Backbone.history.start();
+
+    </script>
+  </body>
+</html>
